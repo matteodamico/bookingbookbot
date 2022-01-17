@@ -6,10 +6,10 @@ var webAppUrl = "https://script.google.com/macros/s/"+id_google_app_script+"/exe
 var telegramUrl = "https://api.telegram.org/bot" + token; 
 
 
-const CANCELLA = "CANCELLA ";
-const PRENOTAZIONI = "PRENOTAZIONI";
-const EMAILME = "EMAILME";
-const EMAIL = "";
+const CANCELLA = " ";
+const PRENOTAZIONI = "";
+const EMAILME = "";
+const EMAIL_ADDRESS = ""
 
 const REGISTERED_BY_COLUMN_INDEX = 1;
 const NOME_PRENOTAZIONE_COLUMN_INDEX = 3;
@@ -19,7 +19,10 @@ const RECEIVED_AT= 8;
 const DELETED_BY_COLUMN_INDEX= 10;
 const TOTAL_COLUMN_INDEX = 6;
 
-const HEADER =["Registered by",	"Giorno prenotazione",	"Nome prenotazione",	"Coperti",	"Orario","Totale Coperti",,"received_at","plain_message","deleted_by"];
+const TIMEZONE = "Europe/Amsterdam";
+const LANGUAGE = "it-IT";
+
+const HEADER =["Registered by",	"Giorno prenotazione",	"Nome prenotazione",	"Coperti",	"Orario","TOTALE COPERTI",,"received_at","plain_message","deleted_by"];
 
 const HEADER_MAIN_BACKGROUND_COLOR = "#99e599";
 const HEADER_TOT_BACKGROUND_COLOR = "yellow";
@@ -32,7 +35,19 @@ const HEADER_HORIZONTAL_TOT_ALIGN = "left";
 const TESTO_BARRATO = "line-through";
 const CANCELLATO = "canceled";
 
+const MSG_SALUTO= "Ciao ";
+const MSG_RESERVATION_ERROR_NUMBER_PERSON = "! Errore nel registrare la prenotazione! Controlla il numero delle persone";
+const MSG_DELETE_RESERVATION_ERROR_NOT_FOUND = " non ho trovato prenotazioni con questo nome. Ricontrolla il nome inserito.";
+const MSG_DELETE_MORE_RESERVATION = " ho trovato più prenotazioni con lo stesso nome. Le ho evidenziate tutte in giallo sul file.";
+const MSG_START ="! scrivi la prenotazione qui sotto per memorizzarla. Scrivi prenotazioni per sapere quali prenotazioni ci sono stasera!";
+const MSG_NOTIFY_EMAIL = ". Prenotazioni del ";
+const MSG_DELETE_RESERVATION_SUCCESS = " ho cancellato la prenotazione di ";
+const MSG_GET_RESERVATIONS = "Ecco le prenotazioni registrate per il ";
+const MSG_GET_NO_RESERVATIONS = "Non ci sono prenotazione per questo giorno!";
+const ASCII_NEW_LINE = " %0A "; 
+const ASCII_HORIZ_TAB = " %09 ";
 
+const EMAIL_SUBJECT = "Prenotazioni pizzeria per il ";
 
 function setWebhook() {
   var url = telegramUrl + "/setWebhook?url=" + webAppUrl;
@@ -90,9 +105,10 @@ function doReservation(user, giornoPrenotazione, text){
   text = text.replace(/\s[\s]+/g, ' ');
   numbers = text.match(/^\d+|\d+\b|\d+(?=\w)/g);
   nomePrenotazione = text.substr(0,text.indexOf(numbers[0]));
+  nomePrenotazione = nomePrenotazione.trim();
 
   if (isNaN(numbers[0])) {
-    return "Ciao "+ user + "! Errore nel registrare la prenotazione! Controlla il numero delle persone";
+    return MSG_SALUTO+ user + MSG_RESERVATION_ERROR_NUMBER_PERSON;
   }
   else{
     numeroPersone=numbers[0];
@@ -113,7 +129,7 @@ function doReservation(user, giornoPrenotazione, text){
   sheet.getRange(sheet.getLastRow(),COPERTI_COLUMN_INDEX).setHorizontalAlignment(HEADER_HORIZONTAL_ALIGN);
   sheet.getRange(sheet.getLastRow(),RECEIVED_AT,sheet.getLastRow(),DELETED_BY_COLUMN_INDEX).setFontColor(HEADER_SECOND_FONT_COLOR);
   sheet.getRange(sheet.getLastRow(),RECEIVED_AT,sheet.getLastRow(),DELETED_BY_COLUMN_INDEX).setFontStyle(HEADER_SECOND_FONT_STYLE); 
-  return "Ciao "+ user + "! Prenotazione per "+numeroPersone +" persone alle "+orarioH+':'+orarioM+" memorizzata con successo!!";
+  return MSG_SALUTO+ user + "! Prenotazione per "+numeroPersone +" persone alle "+orarioH+':'+orarioM+" memorizzata con successo!!";
 }
 
 /**
@@ -121,18 +137,24 @@ function doReservation(user, giornoPrenotazione, text){
  */
 function deleteReservation(user, giornoPrenotazione, text){
   var nomePrenotazione = text.substr(CANCELLA.length);
+  nomePrenotazione = nomePrenotazione.toUpperCase().trim();
+ /* var user="Matteo";
+  var nomePrenotazione = "GG";
+  var giornoPrenotazione = "11/1/2022";*/
   var sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName(giornoPrenotazione);
   var range = sheet.getRange(2,NOME_PRENOTAZIONE_COLUMN_INDEX,sheet.getLastRow(),NOME_PRENOTAZIONE_COLUMN_INDEX);
-  var SHTvalues = range.createTextFinder(nomePrenotazione).findAll();
+  var SHTvalues = range.createTextFinder(nomePrenotazione).matchEntireCell(true).findAll();
   var result = SHTvalues.map(r => (r.getRow()));
   var cell;
   var cell2;
   var cell3;
   var numPrenotFound = result.length;
   if(numPrenotFound == 0){
-     return "Ciao "+ user+ "non ho trovato prenotazioni con questo nome. Ricontrolla il nome inserito.";
+     return MSG_SALUTO+ user+ MSG_DELETE_RESERVATION_ERROR_NOT_FOUND;
   }
-  result.forEach(rowindex => {
+  var rowindex;
+  for (let i = 0; i < result.length; i++){
+    rowindex=result[i];
     cell = sheet.getRange(rowindex,DELETED_BY_COLUMN_INDEX);
     cell.setValue(user);
     cell.setFontColor(HEADER_SECOND_FONT_COLOR);
@@ -142,11 +164,11 @@ function deleteReservation(user, giornoPrenotazione, text){
       cell3.setFontLine(TESTO_BARRATO);
       cell2 = sheet.getRange(rowindex,COPERTI_COLUMN_INDEX);
       cell2.setValue(CANCELLATO);
-      return "Ciao "+ user + " ho cancellato la prenotazione di "+ nomePrenotazione;
+      return MSG_SALUTO+ user + MSG_DELETE_RESERVATION_SUCCESS + nomePrenotazione;
     }
     cell3.setBackground(HEADER_TOT_BACKGROUND_COLOR);  
-  });
-  return "Ciao "+ user+ " ho trovato più prenotazioni con lo stesso nome. Le ho evidenziate tutte in giallo.";
+  };
+  return MSG_SALUTO+ user + MSG_DELETE_MORE_RESERVATION;
 }
 
 /**
@@ -154,19 +176,22 @@ function deleteReservation(user, giornoPrenotazione, text){
  */
 function getAllReservation(giornoPrenotazione){
   var sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName(giornoPrenotazione);
-  var rows = sheet.getRange(1, NOME_PRENOTAZIONE_COLUMN_INDEX, sheet.getLastRow(), ORARIO_COLUMN_INDEX);
+  var rows = sheet.getRange(1, NOME_PRENOTAZIONE_COLUMN_INDEX, sheet.getLastRow(), ORARIO_COLUMN_INDEX).getValues();
   var prenotazioni = "";
   var prenotazione;
-  rows.getValues().forEach(row => {
+  if(rows.length == 0){
+    return MSG_GET_NO_RESERVATIONS;
+  }
+  rows.forEach(row => {
     prenotazione = "";
     for (let i = 0; i < row.length; i++){
       if(row[i] == CANCELLATO){
         prenotazione = "";
         break;
       }
-      prenotazione += row[i]+" %09 ";
+      prenotazione += row[i]+ASCII_HORIZ_TAB;
     }
-    prenotazioni += prenotazione+" %0A ";
+    prenotazioni += prenotazione+ ASCII_NEW_LINE;
   });
   return prenotazioni;
 }
@@ -177,7 +202,7 @@ function getAllReservation(giornoPrenotazione){
 function emailMeReservation(giornoPrenotazione){
   var sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName(giornoPrenotazione);
   var rows = sheet.getRange(1, NOME_PRENOTAZIONE_COLUMN_INDEX, sheet.getLastRow(), ORARIO_COLUMN_INDEX).getValues();
-  var prenotazioni = "Ecco le prenotazioni registrate per il: "+giornoPrenotazione.toString() + " \n";
+  var prenotazioni = MSG_GET_RESERVATIONS +giornoPrenotazione.toString() + ": \n";
   var prenotazione = "";
   rows.forEach(row => {
     prenotazione ="";
@@ -186,14 +211,14 @@ function emailMeReservation(giornoPrenotazione){
     });
     prenotazioni += prenotazione+" \n";
   });
-  MailApp.sendEmail(EMAIL,'Prenotazioni pizzeria per il '+ giornoPrenotazione.toString(), prenotazioni);
+  MailApp.sendEmail(EMAIL_ADDRESS, EMAIL_SUBJECT + giornoPrenotazione.toString(), prenotazioni);
 }
 
 
 
 function doPost(e) {
   var now = new Date();
-  var giornoPrenotazione = now.toLocaleDateString("it-IT", {timeZone: "Europe/Amsterdam"});
+  var giornoPrenotazione = now.toLocaleDateString(LANGUAGE, {timeZone: TIMEZONE});
   var contents = JSON.parse(e.postData.contents);
   var chat_id = contents.message.from.id; 
   var user = contents.message.chat.first_name; //+ " "+ contents.message.chat.last_name;
@@ -201,19 +226,18 @@ function doPost(e) {
   var text = contents.message.text.toUpperCase();
 
   if(text == "/start"){
-    chat_answer = "Ciao "+ user + "! scrivi la prenotazione qui sotto per memorizzarla. "+
-    +"Scrivi prenotazioni per sapere quali prenotazioni ci sono stasera!";
+    chat_answer = MSG_SALUTO + user + MSG_START;
   }
   else if(text.startsWith(PRENOTAZIONI)){    
-    chat_answer = "Ciao "+ user +". Ecco le prenotazioni del "+ giornoPrenotazione.toString()+ ": %0A ";
+    chat_answer = MSG_SALUTO+ user + ". "+MSG_GET_RESERVATIONS+ giornoPrenotazione.toString()+ ": "+ASCII_NEW_LINE;
     chat_answer += getAllReservation(giornoPrenotazione);
   }
   else if(text == EMAILME){
     emailMeReservation(giornoPrenotazione);
-    chat_answer = "Ciao "+ user + ". Prenotazioni del "+giornoPrenotazione.toString()+" inviate via email! ";
+    chat_answer = MSG_SALUTO+ user + MSG_NOTIFY_EMAIL + giornoPrenotazione.toString()+" inviate via email! ";
   }
   else if(text.startsWith(CANCELLA)){ 
-    chat_answer = deleteReservation(user,giornoPrenotazione, text);
+    chat_answer = deleteReservation(user, giornoPrenotazione, text);
   }
   else {
     chat_answer = doReservation(user, giornoPrenotazione, text);
