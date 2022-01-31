@@ -30,6 +30,8 @@ const START = "START";
 const CMD_START = "/START";
 const CMD_OK = "OK";
 const CMD_YES = "SI";
+const CMD_NO = "NO";
+const CMD_HELP = "HELP";
 const CANCELLA = "CANCELLA ";
 const PRENOTA = "PRENOTA";
 const PRENOTAZIONI = "PRENOTAZIONI";
@@ -45,24 +47,26 @@ const CALLBACK_CANCELLA = "CNCL";
 const CALLBACK_NOT_PROPERLY_RECOGNIZED = "NPRZ";
 const CALLBACK_VOICE = "VOICE";
 
-const REGISTERED_BY_COLUMN_INDEX = 1;
-const ASPORTO_COLUMN_INDEX = 6;
-const GIORNO_PRENOTAZIONE_COLUMN_INDEX = 2;
-const ORARIO_COLUMN_INDEX = 3;
-const NOME_PRENOTAZIONE_COLUMN_INDEX = 4;
-const COPERTI_COLUMN_INDEX = 5;
-const TOTAL_COLUMN_INDEX = 7;
-const RECEIVED_AT_COLUMN_INDEX = 9;
-const DELETED_BY_COLUMN_INDEX = 11;
-
-
 const DATE_OPTIONS_LONG = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 const DATE_OPTIONS = { weekday: 'long', month: 'long', day: 'numeric' };
 const TIMEZONE = "Europe/Amsterdam";
 const LANGUAGE = "it-IT";
-const ASCII_NEW_LINE = " %0A ";
-const ASCII_HORIZ_TAB = " %09 ";
+const ASCII_HEX_NEW_LINE_CODE = " %0A ";
+const ASCII_HEX_HORIZ_TAB_CODE = " %09 ";
+const ASCII_CHAR_HORIZ_TAB_CODE = " \t ";
+const ASCII_CHAR_NEW_LINE_CODE = " \n";
+
 const HTTP_OK = 200;
+
+const HEADER_MAIN_BACKGROUND_COLOR = "#99e599";
+const HEADER_TOT_BACKGROUND_COLOR = "yellow";
+const HEADER_MAIN_FONT_SIZE = "12";
+const HEADER_SECOND_FONT_COLOR = "grey";
+const HEADER_MAIN_FONT_STYLE = "bold";
+const HEADER_SECOND_FONT_STYLE = "italic";
+const HEADER_HORIZONTAL_ALIGN = "center";
+const HEADER_HORIZONTAL_TOT_ALIGN = "left";
+const CELL_STYLE_TESTO_BARRATO = "line-through";
 
 const HEADER = ["Registered by", "Giorno prenotazione", "Orario", "Nome prenotazione", "Coperti/ Ordine", "Asporto", "TOTALE COPERTI", , "received_at", "plain_message", "deleted_by"];
 
@@ -102,53 +106,93 @@ const MAIN_COMMAND_BUTTONS = {
     }]
   ]
 };
+const MAIN_REPLY_COMMAND_BUTTONS = {
+  "inline_keyboard": [
+    [{
+      "text": "Si",
+      "callback_data": CMD_YES
+    },
+    {
+      "text": "No",
+      "callback_data": CMD_NO
+    }]
+  ]
+};
 const REPLY_COMMAND = {
   "force_reply": true
 };
 
-const HEADER_MAIN_BACKGROUND_COLOR = "#99e599";
-const HEADER_TOT_BACKGROUND_COLOR = "yellow";
-const HEADER_MAIN_FONT_SIZE = "12";
-const HEADER_SECOND_FONT_COLOR = "grey";
-const HEADER_MAIN_FONT_STYLE = "bold";
-const HEADER_SECOND_FONT_STYLE = "italic";
-const HEADER_HORIZONTAL_ALIGN = "center";
-const HEADER_HORIZONTAL_TOT_ALIGN = "left";
-const TESTO_BARRATO = "line-through";
-const CANCELLATO = "canceled";
+const REGISTERED_BY_COLUMN_INDEX = 1;
+const ASPORTO_COLUMN_INDEX = 6;
+const GIORNO_PRENOTAZIONE_COLUMN_INDEX = 2;
+const ORARIO_COLUMN_INDEX = 3;
+const NOME_PRENOTAZIONE_COLUMN_INDEX = 4;
+const COPERTI_COLUMN_INDEX = 5;
+const TOTAL_COLUMN_INDEX = 7;
+const RECEIVED_AT_COLUMN_INDEX = 9;
+const DELETED_BY_COLUMN_INDEX = 11;
 
-const EMAIL_SUBJECT_TAVOLO = "Prenotazioni Tavoli pizzeria per il ";
-const EMAIL_SUBJECT_ASPORTO = "Prenotazioni Take-Away pizzeria per il ";
-
-const MSG_OK = "OK";
+/**
+ * GENERAL MESSAGES
+ */
 const MSG_SALUTO = "Ciao ";
+const MSG_START = "! Scegli cosa vuoi fare premendo uno dei pulsanti qui sotto. Altrimenti scrivi l'azione manualmente. Scrivi 'help' se vuoi sapere come scrivere un comando manuale."; //TODO help
+const MSG_OK_DAY_SELECTED = "Ok, giorno selezionato! ";
+const MSG_OK_TIME_SELECTED = "Ok, orario selezionato! ";
+const MSG_CHAT_RENEW = "Vuoi effettuare una nuova operazione?";
+const MSG_CHAT_FOR = " per il : ";
+/**
+ * DO RESERVATIONS
+ */
+const MSG_PICK_A_LOCATION = "Seleziona la posizione ";
+const MSG_DATE_TO_RESERVE = "per cui vuoi effettuare la prenotazione ";
+const MSG_PICK_A_DATE = "Seleziona la data tra quelle proposte qui sotto ";
+const MSG_WITH_TABLE = "con TAVOLO";
+const MSG_TAKE_AWAY = "da ASPORTO";
+const MSG_PICK_A_TIME = "Seleziona un orario tra quelli proposti qui sotto ";
+const MSG_OK = "OK ";
+const MSG_GIVE_ME_NAME_RESERVATION = "Scrivi il NOME della prenotazione";
+const MSG_BLANK_DIVIDED = " e separati da uno spazio ";
+const MSG_GIVE_ME_NUMBERS = "il NUMERO di coperti";
+const MSG_DATE_TO_RESERVE2 = " che vuoi prenotare ";
+const MSG_ORDER = "l'ordinazione";
+const MSG_RESERVATION_OK = "Prenotazione memorizzata con successo!! ";
+/**
+ * GET RESERVATIONS
+ */
+const MSG_GET_RESERVATIONS = "Ecco le prenotazioni registrate ";
+const MSG_GET_NO_RESERVATIONS = "Non ci sono prenotazioni per il giorno selezionato! ";
+const MSG_DATE_TO_GETLIST = "per cui vuoi vedere le prenotazioni! ";
+/**
+ * DELETE MESSAGES
+ */
+const MSG_DELETE_RESERVATION_SUCCESS = " ho cancellato la prenotazione di ";
+const MSG_DATE_TO_CANCEL = "per cui vuoi cancellare la prenotazione! ";
+const MSG_DATE_TO_CANCEL2 = " che vuoi cancellare";
+const CANCELLATO = "canceled";
+/**
+ * ERROR MESSAGES
+ */
 const MSG_RESERVATION_ERROR_NUMBER_PERSON = "! Errore nel registrare la prenotazione! Controlla il numero delle persone";
 const MSG_DELETE_RESERVATION_ERROR_NOT_FOUND = " non ho trovato prenotazioni con questo nome. Ricontrolla il nome inserito.";
 const MSG_DELETE_MORE_RESERVATION = " ho trovato più prenotazioni con lo stesso nome. Le ho evidenziate tutte in giallo sul file.";
-const MSG_START = "! scrivi la prenotazione qui sotto per memorizzarla. Oppure premi uno dei pulsanti qui sotto.";
-const MSG_NOTIFY_EMAIL = "Prenotazioni del ";
-const MSG_DELETE_RESERVATION_SUCCESS = " ho cancellato la prenotazione di ";
-const MSG_GET_RESERVATIONS = "Ecco le prenotazioni registrate ";
-const MSG_GET_NO_RESERVATIONS = "Non ci sono prenotazioni per il giorno selezionato!";
-const MSG_PICK_A_DATE = "Scegli la data tra quelle qui sotto ";
-const MSG_PICK_A_LOCATION = "Scegli la posizione ";
-const MSG_PICK_A_TIME = "Seleziona un orario tra quelli qui sotto ";
-const MSG_DATE_TO_RESERVE = "per cui vuoi prenotare ";
-const MSG_DATE_TO_RESERVE2 = " che vuoi prenotare ";
-const MSG_DATE_TO_CANCEL = "per cui vuoi cancellare la prenotazione!";
-const MSG_DATE_TO_CANCEL2 = " che vuoi cancellare";
-const MSG_GIVE_ME_NAME_RESERVATION = "Scrivi il nome della prenotazione";
-const MSG_OK_DAY_SELECTED = "Ok, giorno selezionato!";
-const MSG_OK_TIME_SELECTED = "Ok, orario selezionato!";
-const MSG_GIVE_ME_NUMBERS = "il numero di coperti separati da uno spazio";
-const MSG_RESERVATION_OK = "Prenotazione memorizzata con successo!! ";
-const MSG_CHAT_RENEW = "Vuoi effettuare una nuova operazione?";
-const MSG_DATE_TO_GETLIST = "per cui vuoi vedere le prenotazioni!";
 const MSG_NOT_RECOGNIZED = "Non sono riuscito a capire il messaggio audio";
 const MSG_SORRY_RETRY = "Mi dispiace, riprova con un nuovo vocale.";
-const MSG_TAKE_AWAY = "da ASPORTO";
-const MSG_WITH_TABLE = "con TAVOLO";
-const MSG_FOOD_AND_BEVERAGE = " cibo e bevande";
+/**
+ * EMAIL
+ */
+const MSG_NOTIFY_EMAIL = "Prenotazioni del ";
+const EMAIL_SUBJECT_TAVOLO = "Prenotazioni Tavoli Pizzeria per il ";
+const EMAIL_SUBJECT_ASPORTO = "Prenotazioni Take-Away Pizzeria per il ";
+const MSG_DATE_TO_EMAIL_LIST = "per cui vuoi ricevere le prenotazioni tramite email! ";
+const MSG_SENT_VIA_EMAIL = " inviate via email! ";
+/**
+ * HELP
+ */
+const MSG_HELP_MAIN= "Ecco la lista di comandi che puoi utilizzare per effettuare un azione manualmente.\n- Scrivi *start* per riavviare la chat guidata.";
+const MSG_HELP_1="- Scrivi *prenotazioni* per sapere le prenotazioni con tavolo per stasera.";
+const MSG_HELP_2="- Scrivi *prenotazioni 1/2* oppure *1/2/22* oppure *1/2/2022* per conoscere le prenotazioni di un determinato giorno.";
+const MSG_HELP_3="- Scrivi *emailme* per ricevere via email le prenotazioni con TAVOLO per questa sera. Funziona solo se sei stato abilitato.";
 
 /**
  * SENDERS
@@ -170,6 +214,18 @@ function sendKeyboard(chatId, text, keyboard) {
       text: text,
       parse_mode: "HTML",
       reply_markup: JSON.stringify(keyboard)
+    }
+  };
+  UrlFetchApp.fetch(TELEGRAMURL + '/', data);
+}
+function sendMessageFormatted(chatId, text) {
+  var data = {
+    method: "post",
+    payload: {
+      method: "sendMessage",
+      chat_id: String(chatId),
+      text: text,
+      parse_mode: "markdown"//"HTML"
     }
   };
   UrlFetchApp.fetch(TELEGRAMURL + '/', data);
@@ -235,6 +291,9 @@ function rimuoviData(nomePrenotazione) {
     testobonificato += testo[i] + " ";
   }
   return testobonificato;
+}
+function getHelpDescription(){
+  return MSG_HELP_MAIN + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_1+ ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_2+ASCII_CHAR_NEW_LINE_CODE+MSG_HELP_3;
 }
 /**
  * BUTTONS
@@ -369,31 +428,25 @@ function createSheet(giornoPrenotazione) {
 /**
  * RESERVATION 
  */
-function doReservation(user,giornoPrenotazione, orario, nomePrenotazione, numeroPersone, text) {
-  var now = new Date();
-  var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(giornoPrenotazione);
-  if (sheet == null) {
-    createSheet(giornoPrenotazione);
-    sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(giornoPrenotazione);
-  }
-  sheet.appendRow([user,giornoPrenotazione, orario, nomePrenotazione, numeroPersone, , , ,now, text]);
-  sheet.getRange(sheet.getLastRow(), COPERTI_COLUMN_INDEX).setHorizontalAlignment(HEADER_HORIZONTAL_ALIGN);
-  sheet.getRange(sheet.getLastRow(), RECEIVED_AT_COLUMN_INDEX, sheet.getLastRow(), DELETED_BY_COLUMN_INDEX).setFontColor(HEADER_SECOND_FONT_COLOR);
-  sheet.getRange(sheet.getLastRow(), RECEIVED_AT_COLUMN_INDEX, sheet.getLastRow(), DELETED_BY_COLUMN_INDEX).setFontStyle(HEADER_SECOND_FONT_STYLE);
+function doReservation(user, giornoPrenotazione, orario, nomePrenotazione, numeroPersone, text) {
+  createReservation(user, giornoPrenotazione, orario, nomePrenotazione, numeroPersone, '', text);
   return MSG_RESERVATION_OK + numeroPersone + " persone il " + giornoPrenotazione + " alle " + orario + " a nome: " + nomePrenotazione;
 }
 function doReservationTakeAway(user, giornoPrenotazione, orario, nomePrenotazione, ordinazione, text) {
+  createReservation(user, giornoPrenotazione, orario, nomePrenotazione, ordinazione, ASPORTO, text);
+  return MSG_RESERVATION_OK + ASPORTO + " per il " + giornoPrenotazione + " alle " + orario + " a nome: " + nomePrenotazione;
+}
+function createReservation(user, giornoPrenotazione, orario, nomePrenotazione, ordinazione_numCoperti, asporto_text, text) {
   var now = new Date();
   var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(giornoPrenotazione);
   if (sheet == null) {
     createSheet(giornoPrenotazione);
     sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(giornoPrenotazione);
   }
-  sheet.appendRow([user, giornoPrenotazione, orario, nomePrenotazione, ordinazione,ASPORTO, , ,now, text]);
+  sheet.appendRow([user, giornoPrenotazione, orario, nomePrenotazione, ordinazione_numCoperti, asporto_text, , , now, text]);
   sheet.getRange(sheet.getLastRow(), COPERTI_COLUMN_INDEX).setHorizontalAlignment(HEADER_HORIZONTAL_ALIGN);
   sheet.getRange(sheet.getLastRow(), RECEIVED_AT_COLUMN_INDEX, sheet.getLastRow(), DELETED_BY_COLUMN_INDEX).setFontColor(HEADER_SECOND_FONT_COLOR);
   sheet.getRange(sheet.getLastRow(), RECEIVED_AT_COLUMN_INDEX, sheet.getLastRow(), DELETED_BY_COLUMN_INDEX).setFontStyle(HEADER_SECOND_FONT_STYLE);
-  return MSG_RESERVATION_OK + ASPORTO + " per il " + giornoPrenotazione + " alle " + orario + " a nome: " + nomePrenotazione;
 }
 function processReservation(user, giornoPrenotazione, time, text) {
 
@@ -426,7 +479,7 @@ function processReservation(user, giornoPrenotazione, time, text) {
   nomePrenotazione = nomePrenotazione.trim();
 
   if (isNaN(numbers[0])) {
-    return MSG_SALUTO + user + MSG_RESERVATION_ERROR_NUMBER_PERSON;
+    return MSG_SALUTO + user +MSG_RESERVATION_ERROR_NUMBER_PERSON;
   }
   else {
     numeroPersone = numbers[0];
@@ -460,7 +513,7 @@ function deleteReservation(user, giornoPrenotazione, text) {
   var cell3;
   var numPrenotFound = result.length;
   if (numPrenotFound == 0) {
-    return MSG_SALUTO + user + MSG_DELETE_RESERVATION_ERROR_NOT_FOUND;
+    return MSG_SALUTO + user  +MSG_DELETE_RESERVATION_ERROR_NOT_FOUND;
   }
   var rowindex;
   for (let i = 0; i < result.length; i++) {
@@ -471,7 +524,7 @@ function deleteReservation(user, giornoPrenotazione, text) {
     cell.setFontStyle(HEADER_SECOND_FONT_STYLE);
     cell3 = sheet.getRange(rowindex, 1, 1, COPERTI_COLUMN_INDEX);
     if (numPrenotFound == 1) {
-      cell3.setFontLine(TESTO_BARRATO);
+      cell3.setFontLine(CELL_STYLE_TESTO_BARRATO);
       cell2 = sheet.getRange(rowindex, COPERTI_COLUMN_INDEX);
       cell2.setValue(CANCELLATO);
       return MSG_SALUTO + user + MSG_DELETE_RESERVATION_SUCCESS + nomePrenotazione + " per il " + giornoPrenotazione;
@@ -481,33 +534,48 @@ function deleteReservation(user, giornoPrenotazione, text) {
   return MSG_SALUTO + user + MSG_DELETE_MORE_RESERVATION;
 }
 /**
- * GET ALL
+ * GET RESERVATIONS
  */
-function getAllReservation(giornoPrenotazione, asporto) {
+function getReservations(giornoPrenotazione, asporto) {
+  var email = false;
+  return getFilteredReservations(giornoPrenotazione, asporto, email)
+}
+function getEmailReservations(giornoPrenotazione, asporto) {
+  var email = true;
+  return getFilteredReservations(giornoPrenotazione, asporto, email)
+}
+function getFilteredReservations(giornoPrenotazione, asporto, email) {
   var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(giornoPrenotazione);
   if (!sheet)
-    return MSG_GET_NO_RESERVATIONS;  
+    return null;
   var rows = sheet.getRange(1, ORARIO_COLUMN_INDEX, sheet.getLastRow(), 4).getValues();
   var newRows = null;
-  var prenotazioni =""; 
   if (asporto == true) {
     newRows = rows.filter(function (row) {
       return row[3] == "ASPORTO";
     });
   }
   else {
-    var total = sheet.getRange(1, TOTAL_COLUMN_INDEX, sheet.getLastRow(), 2).getValues();
-    prenotazioni = total[0] + total[1] + ASCII_NEW_LINE;   
     newRows = rows.filter(function (row) {
       return row[3] == "";
     });
   }
- 
-  prenotazioni = prenotazioni.replace(/[.,:_]+/g, ' ');
-  var prenotazione;
   if (newRows.length == 0) {
-    return MSG_GET_NO_RESERVATIONS;
+    return null;
   }
+  var newLineCode = ASCII_HEX_NEW_LINE_CODE;
+  var tabCode = ASCII_HEX_HORIZ_TAB_CODE;
+  if (email == true) {
+    newLineCode = ASCII_CHAR_NEW_LINE_CODE;
+    tabCode = ASCII_CHAR_HORIZ_TAB_CODE;
+  }
+  var prenotazioni = "";
+  if (asporto == false) {
+    var total = sheet.getRange(1, TOTAL_COLUMN_INDEX, sheet.getLastRow(), 2).getValues();
+    prenotazioni = "= " + total[0] + " = " + total[1] + newLineCode;
+    prenotazioni = prenotazioni.replace(/[.,:_]+/g, ' ');
+  }
+  var prenotazione;
   newRows.forEach(row => {
     prenotazione = "";
     for (let i = 0; i < 3; i++) {
@@ -515,9 +583,9 @@ function getAllReservation(giornoPrenotazione, asporto) {
         prenotazione = "";
         break;
       }
-      prenotazione += row[i] + ASCII_HORIZ_TAB;
+      prenotazione += row[i] + tabCode;
     }
-    prenotazioni += prenotazione + ASCII_NEW_LINE;
+    prenotazioni += prenotazione + newLineCode;
   });
   return prenotazioni;
 }
@@ -525,33 +593,18 @@ function getAllReservation(giornoPrenotazione, asporto) {
  * EMAIL
  */
 function emailMeReservation(user, giornoPrenotazione, asporto) {
-  var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(giornoPrenotazione);
-  if (!sheet)
+  var prenotazioni = getEmailReservations(giornoPrenotazione, asporto);
+  if (!prenotazioni) {
     return MSG_GET_NO_RESERVATIONS;
-  var total = sheet.getRange(1, TOTAL_COLUMN_INDEX, sheet.getLastRow(), 2).getValues();
-  var rows = sheet.getRange(1, ORARIO_COLUMN_INDEX, sheet.getLastRow(), 4).getValues();
-  var newRows = null;
+  }
+  var body = MSG_GET_RESERVATIONS + giornoPrenotazione.toString() + ":" + ASCII_CHAR_NEW_LINE_CODE;
+  body += prenotazioni;
+
+  var subject = EMAIL_SUBJECT_TAVOLO + giornoPrenotazione.toString();
   if (asporto == true) {
-    newRows = rows.filter(function (row) {
-      return row[3] == "ASPORTO";
-    });
+    subject = EMAIL_SUBJECT_ASPORTO + giornoPrenotazione.toString();
   }
-  else {
-    newRows = rows.filter(function (row) {
-      return row[3] == "";
-    });
-  }
-  var prenotazioni = MSG_GET_RESERVATIONS + giornoPrenotazione.toString() + ": \n";
-  prenotazioni += total[0] + total[1] + " \n";
-  prenotazioni = prenotazioni.replace(/[.,:_]+/g, ' ');
-  var prenotazione = "";
-  newRows.forEach(row => {
-    prenotazione = "";
-    row.forEach(campo => {
-      prenotazione += campo + " \t ";
-    });
-    prenotazioni += prenotazione + " \n";
-  });
+
   var email = EMAIL_ADDRESS_M;
   if (user == NAME_C) {
     email = EMAIL_ADDRESS_C;
@@ -562,8 +615,8 @@ function emailMeReservation(user, giornoPrenotazione, asporto) {
   else if (user == NAME_A) {
     email = EMAIL_ADDRESS_A;
   }
-  MailApp.sendEmail(email, EMAIL_SUBJECT_TAVOLO + giornoPrenotazione.toString(), prenotazioni);
-  return MSG_NOTIFY_EMAIL + giornoPrenotazione.toString() + " inviate via email! ";
+  MailApp.sendEmail(email, subject, body);
+  return MSG_NOTIFY_EMAIL + giornoPrenotazione.toString() + MSG_SENT_VIA_EMAIL;
 }
 /**
  * GCP AUTHENTICATION
@@ -584,10 +637,9 @@ function check() {
     Logger.log(service.getLastError());
   }
 }
-
 /**
  *  TRANSCRIBE 
- * */
+ */
 function transcribe(contenuto) {
   var payload = {
     "config": {
@@ -622,6 +674,9 @@ function transcribe(contenuto) {
   return null;
 }
 
+/**
+ *  PROCESSOR 
+ */
 function processCallback(contents) {
   var chat_answer = "";
   var now = new Date();
@@ -631,10 +686,10 @@ function processCallback(contents) {
   var user = contents.callback_query.message.chat.first_name;
   var text = contents.callback_query.data;
   chat_answer = MSG_SALUTO + user + "! ";
-  
+
   //PRENOTAZIONI - PICK A LOCATION
   if (text == PRENOTAZIONI) {
-    chat_answer += MSG_PICK_A_LOCATION + MSG_DATE_TO_GETLIST;
+    chat_answer = MSG_PICK_A_LOCATION + MSG_DATE_TO_GETLIST;
     answerCallbackMessage(query_id, "");
     return sendKeyboard(chat_id, chat_answer, getLocationButtons(PRENOTAZIONI));
   }
@@ -643,35 +698,51 @@ function processCallback(contents) {
     var now = new Date();
     var location = text.substring(PRENOTAZIONI.length + 1);
     var next_dates_button = getNextDatesButton(CALLBACK_LIST_PREN + "_" + location, now);
-    chat_answer += MSG_PICK_A_DATE + MSG_DATE_TO_GETLIST;
+    chat_answer = MSG_PICK_A_DATE + MSG_DATE_TO_GETLIST;
     answerCallbackMessage(query_id, "");
     return sendKeyboard(chat_id, chat_answer, next_dates_button);
   }
-
+  //PRENOTAZIONE - GET A NAME
   else if (text.startsWith(CALLBACK_LIST_PREN)) {
+    chat_answer = MSG_OK + user + "! ";
     var location = text.substring(CALLBACK_LIST_PREN.length + 1, CALLBACK_LIST_PREN.length + 1 + CALLBACK_ASPORTO.length);
     var asporto = false;
     var location_text = MSG_WITH_TABLE;
-    if (location == CALLBACK_ASPORTO){
+    if (location == CALLBACK_ASPORTO) {
       asporto = true;
       location_text = MSG_TAKE_AWAY;
     }
     var giornoPrenotazione = text.substring(CALLBACK_LIST_PREN.length + 1 + CALLBACK_ASPORTO.length + 1);
-    chat_answer = MSG_SALUTO + user + ". " + MSG_GET_RESERVATIONS + location_text + " per il : "+ giornoPrenotazione  + ASCII_NEW_LINE;
-    chat_answer += getAllReservation(giornoPrenotazione, asporto);
+    var prenotazioni = getReservations(giornoPrenotazione, asporto);
+    if (!prenotazioni) {
+      chat_answer = MSG_GET_NO_RESERVATIONS;
+    }
+    else {
+      chat_answer += MSG_GET_RESERVATIONS + location_text + MSG_CHAT_FOR + giornoPrenotazione + ASCII_HEX_NEW_LINE_CODE;
+      chat_answer += prenotazioni;
+    }
     answerCallbackMessage(query_id, MSG_OK_DAY_SELECTED);
     sendMessage(chat_id, chat_answer);
-    var chat_proposal_renew = MSG_CHAT_RENEW;
-    sendMessage(chat_id, chat_proposal_renew);
+    return sendKeyboard(chat_id, MSG_CHAT_RENEW, MAIN_REPLY_COMMAND_BUTTONS);
   }
+  //EMAIL
   else if (text == EMAILME) {
-    chat_answer = MSG_SALUTO + user + "!";
+    chat_answer = MSG_PICK_A_LOCATION + MSG_DATE_TO_EMAIL_LIST;
+    answerCallbackMessage(query_id, "");
+    return sendKeyboard(chat_id, chat_answer, getLocationButtons(text));
+  }
+  //EMAIL - PICK A LOCATION
+  else if (text.startsWith(EMAILME)) {
+    chat_answer = MSG_OK + user + "! ";
     var asporto = false;
+    var commands = text.split("_");
+    if (commands[1] == CALLBACK_ASPORTO) {
+      asporto = true;
+    }
     chat_answer += emailMeReservation(user, giornoPrenotazione, asporto);
     answerCallbackMessage(query_id, "");
     sendMessage(chat_id, chat_answer);
-    var chat_proposal_renew = MSG_CHAT_RENEW;
-    sendMessage(chat_id, chat_proposal_renew);
+    return sendKeyboard(chat_id, MSG_CHAT_RENEW, MAIN_REPLY_COMMAND_BUTTONS);
   }
   //PRENOTA - PICK A LOCATION
   else if (text == PRENOTA) {
@@ -684,40 +755,40 @@ function processCallback(contents) {
     var now = new Date();
     var location = text.substring(PRENOTA.length + 1);
     var location_text = MSG_WITH_TABLE;
-    if(location==CALLBACK_ASPORTO)
-    location_text= MSG_TAKE_AWAY;
+    if (location == CALLBACK_ASPORTO)
+      location_text = MSG_TAKE_AWAY;
     var next_dates_button = getNextDatesButton(text, now);
-    chat_answer = MSG_PICK_A_DATE + MSG_DATE_TO_RESERVE+ location_text;
+    chat_answer = MSG_PICK_A_DATE + MSG_DATE_TO_RESERVE + location_text;
     answerCallbackMessage(query_id, "");
     return sendKeyboard(chat_id, chat_answer, next_dates_button);
   }
   //PRENOTA - PICK A TIME
-  else if (text.startsWith(PRENOTA+"_"+CALLBACK_TAVOLO) || text.startsWith(PRENOTA+"_"+CALLBACK_ASPORTO)) {
-    var giornoPrenotazione = text.substring(PRENOTA.length+1+CALLBACK_TAVOLO.length + 1);
-    var location = text.substring(PRENOTA.length + 1,PRENOTA.length+1+CALLBACK_TAVOLO.length);
+  else if (text.startsWith(PRENOTA + "_" + CALLBACK_TAVOLO) || text.startsWith(PRENOTA + "_" + CALLBACK_ASPORTO)) {
+    var giornoPrenotazione = text.substring(PRENOTA.length + 1 + CALLBACK_TAVOLO.length + 1);
+    var location = text.substring(PRENOTA.length + 1, PRENOTA.length + 1 + CALLBACK_TAVOLO.length);
     var location_text = MSG_WITH_TABLE;
-    if(location==CALLBACK_ASPORTO)
-    location_text= MSG_TAKE_AWAY;
-    var times_button = getOrariButton(CALLBACK_PRENOTA_ORARIO + "_" + text.substring(PRENOTA.length+1, PRENOTA.length+1+CALLBACK_TAVOLO.length), giornoPrenotazione);
-    chat_answer = MSG_PICK_A_TIME + MSG_DATE_TO_RESERVE +location_text + " per il : " + giornoPrenotazione;
+    if (location == CALLBACK_ASPORTO)
+      location_text = MSG_TAKE_AWAY;
+    var times_button = getOrariButton(CALLBACK_PRENOTA_ORARIO + "_" + text.substring(PRENOTA.length + 1, PRENOTA.length + 1 + CALLBACK_TAVOLO.length), giornoPrenotazione);
+    chat_answer = MSG_PICK_A_TIME + MSG_DATE_TO_RESERVE + location_text + MSG_CHAT_FOR + giornoPrenotazione;
     answerCallbackMessage(query_id, MSG_OK_DAY_SELECTED);
     return sendKeyboard(chat_id, chat_answer, times_button);
   }
   //PRENOTA - GET A NAME
   else if (text.startsWith(CALLBACK_PRENOTA_ORARIO)) {
+    chat_answer = MSG_OK + user + "! ";
     var location = text.substring(CALLBACK_PRENOTA_ORARIO.length + 1, CALLBACK_PRENOTA_ORARIO.length + 1 + CALLBACK_TAVOLO.length);
     var datetime = text.substring(CALLBACK_PRENOTA_ORARIO.length + 1 + CALLBACK_TAVOLO.length + 1);
     var location_text = MSG_WITH_TABLE;
-    if (location == CALLBACK_TAVOLO) {
-      chat_answer += MSG_GIVE_ME_NAME_RESERVATION + " e " + MSG_GIVE_ME_NUMBERS + MSG_DATE_TO_RESERVE2 + location_text +" per il : " + datetime;
-    }
+    chat_answer += MSG_GIVE_ME_NAME_RESERVATION + MSG_BLANK_DIVIDED + MSG_GIVE_ME_NUMBERS + MSG_DATE_TO_RESERVE2 + location_text + MSG_CHAT_FOR + datetime;
     if (location == CALLBACK_ASPORTO) {
-      location_text= MSG_TAKE_AWAY;
-      chat_answer += MSG_GIVE_ME_NAME_RESERVATION + " e separati da spazio " + MSG_FOOD_AND_BEVERAGE + MSG_DATE_TO_RESERVE2 + MSG_TAKE_AWAY + " per il : " + datetime;
+      location_text = MSG_TAKE_AWAY;
+      chat_answer += MSG_GIVE_ME_NAME_RESERVATION + MSG_BLANK_DIVIDED + MSG_ORDER + MSG_DATE_TO_RESERVE2 + MSG_TAKE_AWAY + MSG_CHAT_FOR + datetime;
     }
     answerCallbackMessage(query_id, MSG_OK_TIME_SELECTED);
     return sendKeyboard(chat_id, chat_answer, REPLY_COMMAND);
   }
+  //CANCELLA - PICK A DATE
   else if (text == CANCELLA) {
     var now = new Date();
     var next_dates_button = getNextDatesButton(CALLBACK_CANCELLA, now);
@@ -725,11 +796,14 @@ function processCallback(contents) {
     answerCallbackMessage(query_id, "");
     return sendKeyboard(chat_id, chat_answer, next_dates_button);
   }
+  //CANCELLA - GET A NAME
   else if (text.startsWith(CALLBACK_CANCELLA)) {
+    chat_answer = MSG_OK + user + "! ";
     chat_answer += MSG_GIVE_ME_NAME_RESERVATION + MSG_DATE_TO_CANCEL2 + " del : " + text.substring(CALLBACK_CANCELLA.length + 1);
     answerCallbackMessage(query_id, MSG_OK_DAY_SELECTED);
     return sendKeyboard(chat_id, chat_answer, REPLY_COMMAND);
   }
+  //VOICE
   else if (text == (CALLBACK_VOICE + "_" + CALLBACK_NOT_PROPERLY_RECOGNIZED)) {
     chat_answer = MSG_SORRY_RETRY;
     answerCallbackMessage(query_id, "");
@@ -737,10 +811,15 @@ function processCallback(contents) {
   }
   else if (text.startsWith(CALLBACK_VOICE)) {
     answerCallbackMessage(query_id, "");
-    processTextMessage(chat_id, user, text.substr(CALLBACK_VOICE.length + 1));
+    return processTextMessage(chat_id, user, text.substr(CALLBACK_VOICE.length + 1));
   }
+  else if (text == CMD_YES) {
+    chat_answer = MSG_SALUTO + user + MSG_START;
+    answerCallbackMessage(query_id, "");
+    return sendKeyboard(chat_id, chat_answer, getMainButtons(user));
+  }
+  answerCallbackMessage(query_id, "");
 }
-
 function processTextMessage(chat_id, user, text, date, time) {
   var chat_answer = "";
   var text = text.toUpperCase();
@@ -754,14 +833,24 @@ function processTextMessage(chat_id, user, text, date, time) {
     chat_answer = MSG_SALUTO + user + MSG_START;
     return sendKeyboard(chat_id, chat_answer, getMainButtons(user));
   }
+  if (text == CMD_HELP) {
+    chat_answer = MSG_SALUTO + user + "! "+ASCII_CHAR_NEW_LINE_CODE + getHelpDescription();
+    return sendMessageFormatted(chat_id, chat_answer);
+  }
   else if (text.startsWith(PRENOTAZIONI)) {
     var asporto = false;
-    chat_answer = MSG_SALUTO + user + ". " + MSG_GET_RESERVATIONS + giornoPrenotazione + ": " + ASCII_NEW_LINE;
-    chat_answer += getAllReservation(giornoPrenotazione, asporto);
+    var prenotazioni = getReservations(giornoPrenotazione, asporto);
+    if (!prenotazioni) {
+      chat_answer = MSG_GET_NO_RESERVATIONS;
+    }
+    else {
+      chat_answer = MSG_SALUTO + user + ". " + MSG_GET_RESERVATIONS + giornoPrenotazione + ": " + ASCII_HEX_NEW_LINE_CODE;
+      chat_answer += prenotazioni;
+    }
   }
   else if (text.startsWith(EMAILME)) {
     var asporto = false;
-    chat_answer = MSG_SALUTO + user;
+    chat_answer = MSG_SALUTO + user+"! ";
     chat_answer += emailMeReservation(user, giornoPrenotazione, asporto);
   }
   else if (text.startsWith(CANCELLA)) {
@@ -771,14 +860,12 @@ function processTextMessage(chat_id, user, text, date, time) {
     chat_answer = processReservation(user, giornoPrenotazione, time, text);
   }
   sendMessage(chat_id, chat_answer);
-  var chat_proposal_renew = MSG_CHAT_RENEW;
-  sendMessage(chat_id, chat_proposal_renew);
+  return sendKeyboard(chat_id, MSG_CHAT_RENEW, MAIN_REPLY_COMMAND_BUTTONS);
 }
-
 function processVoiceMessage(chat_id, user, voice_mex) {
   var audio_id = voice_mex.file_id;
   //var audio_id = "AwACAgQAAxkBAAICtGHudvA2mXNSvtbCyV6Vk1YOzr5KAAIDDAACrMJxU37n7S5prxBLIwQ";
-  var chat_answer = MSG_SALUTO + user + "!";
+  var chat_answer = MSG_SALUTO + user + "! ";
   var audio_blob = getFile(audio_id);
   var contenutob64 = Utilities.base64Encode(audio_blob.getBytes());
   check();
@@ -790,7 +877,6 @@ function processVoiceMessage(chat_id, user, voice_mex) {
   var yes_no_buttons = getYesOrNoButtons(CALLBACK_VOICE, response);
   sendKeyboard(chat_id, chat_answer, yes_no_buttons);
 }
-
 function doPost(e) {
   var contents = JSON.parse(e.postData.contents);
   if (contents.callback_query) {
@@ -849,18 +935,18 @@ function test() {
   //date = parseDate(giorno_prenotazione_text);
 
   var chat_answer = "Null";
-  var text = "fernando 4 6 " + giorno_prenotazione_text;
+  var text = "matt 4 6 " + giorno_prenotazione_text;
 
   var text = "prenotazioni 25/1/2022";
   //var text = 'start'; // prenotazione
   //var text = "/start"; // start
-  //var text = "cancella san fernando " + giorno_prenotazione_text; // cancellazione
+  //var text = "cancella san " + giorno_prenotazione_text; // cancellazione
   //var text = "prenotazioni"; // prenotazioni
   //var text = "emailme"; //email me
   text = text.toUpperCase();
 
   processTextMessage(chat_id, user, text, date, null);
-  
+
   //processVoiceMessage(chat_id, user, null);
 
   if (text == "START") {
@@ -870,8 +956,14 @@ function test() {
 
   else if (text.startsWith(PRENOTAZIONI)) {
     var asporto = false;
-    chat_answer = MSG_SALUTO + user + ". " + MSG_GET_RESERVATIONS + giornoPrenotazione.toString() + ": " + ASCII_NEW_LINE;
-    chat_answer += getAllReservation(giornoPrenotazione, asporto);
+    var prenotazioni = getReservations(giornoPrenotazione, asporto);
+    if (!prenotazioni) {
+      chat_answer = MSG_GET_NO_RESERVATIONS;
+    }
+    else {
+      chat_answer = MSG_SALUTO + user + ". " + MSG_GET_RESERVATIONS + giornoPrenotazione + ": " + ASCII_HEX_NEW_LINE_CODE;
+      chat_answer += prenotazioni;
+    }
   }
   else if (text == EMAILME) {
     chat_answer = MSG_SALUTO + user;
@@ -887,6 +979,5 @@ function test() {
 
   Logger.log("RISPOSTA: " + chat_answer);
   sendMessage(chat_id, chat_answer);
-  var chat_proposal_renew = MSG_CHAT_RENEW;
-  sendMessage(chat_id, chat_proposal_renew);
+  return sendKeyboard(chat_id, MSG_CHAT_RENEW, MAIN_REPLY_COMMAND_BUTTONS);
 }
