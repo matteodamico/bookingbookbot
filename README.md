@@ -1,6 +1,6 @@
 # bookingbookbot
 
-##Disclaimer
+## Disclaimer
 This project wants to be a working exercise with telegram bot and Google app script and javascript as well.
 Due to other projects that are making my days full I'm not able to adjust and rewrite the code that became a mess in different parts.
 Anyway I'm increasing it in the spare time increasing the features adopting an Agile approach but taking no time to refactor it. I hope someday...
