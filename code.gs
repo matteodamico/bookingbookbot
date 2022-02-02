@@ -37,6 +37,12 @@ const PRENOTA = "PRENOTA";
 const PRENOTAZIONI = "PRENOTAZIONI";
 const EMAILME = "EMAILME";
 const ASPORTO = "ASPORTO";
+const HELP_MAIN_CMD = "MAIN";
+const HELP_PRENOTA_CMD = PRENOTA;
+const HELP_PRENOTAZIONI_CMD = PRENOTAZIONI;
+const HELP_EMAILME_CMD = EMAILME;
+const HELP_CANCELLA_CMD = CANCELLA;
+
 
 const CALLBACK_TAVOLO = "INSIDE";
 const CALLBACK_ASPORTO = "TAKEAW";
@@ -136,7 +142,7 @@ const DELETED_BY_COLUMN_INDEX = 11;
  * GENERAL MESSAGES
  */
 const MSG_SALUTO = "Ciao ";
-const MSG_START = "! Scegli cosa vuoi fare premendo uno dei pulsanti qui sotto. Altrimenti scrivi l'azione manualmente. Scrivi 'help' se vuoi sapere come scrivere un comando manuale."; //TODO help
+const MSG_START = "! Scegli cosa vuoi fare premendo uno dei pulsanti qui sotto. Altrimenti scrivi l'azione manualmente. Scrivi <b>help</b> se vuoi sapere come scrivere un comando manuale."; //TODO help
 const MSG_OK_DAY_SELECTED = "Ok, giorno selezionato! ";
 const MSG_OK_TIME_SELECTED = "Ok, orario selezionato! ";
 const MSG_CHAT_RENEW = "Vuoi effettuare una nuova operazione?";
@@ -189,10 +195,34 @@ const MSG_SENT_VIA_EMAIL = " inviate via email! ";
 /**
  * HELP
  */
-const MSG_HELP_MAIN= "Ecco la lista di comandi che puoi utilizzare per effettuare un azione manualmente.\n- Scrivi *start* per riavviare la chat guidata.";
-const MSG_HELP_1="- Scrivi *prenotazioni* per sapere le prenotazioni con tavolo per stasera.";
-const MSG_HELP_2="- Scrivi *prenotazioni 1/2* oppure *1/2/22* oppure *1/2/2022* per conoscere le prenotazioni di un determinato giorno.";
-const MSG_HELP_3="- Scrivi *emailme* per ricevere via email le prenotazioni con TAVOLO per questa sera. Funziona solo se sei stato abilitato.";
+const MSG_HELP_MAIN = "Ecco la lista di comandi che puoi utilizzare per effettuare un azione manualmente:\n- Scrivi *start* per riavviare la chat guidata.";
+const MSG_HELP_MAIN_1 = "- Inserisci la prenotazione che vuoi registrare in un *UNICO* messaggio separando i campi da spazi. Puoi scrivere indifferentemente maiuscolo e minuscolo. Il nome della prenotazione *NON* deve contenere spazi. ";
+const MSG_HELP_MAIN_2 = "- Inserisci le *date* mediante / (slash). Il programma è in grado di interpretare *1/2* oppure *01/02/22* oppure *01/2/2022*. *IMPORTANTE:* Le date devo essere inserite per ultime.";
+
+const MSG_HELP_PRNT = "Se vuoi REGISTRARE manualmente una PRENOTAZIONE:";
+const MSG_HELP_PRNT_A = "Con *TAVOLO*= Scrivi, in questo ordine: '*NomePrenotazione NumeroCoperti Orario*(facoltativo) *Data*(facoltativa)'.I valori facoltativi se omessi sono sostituiti con valori standard: (orario = 00:00) e (data = oggi).";
+const MSG_HELP_PRNT_B = "Da *ASPORTO*= Scrivi '*NomePrenotazione Asporto Ordinazione Orario*(facoltativo) *Data*(facoltativa)'.\nI valori facoltativi se omessi sono sostituiti con valori standard: (orario = 00:00) e (data = oggi). Ad Esempio:";
+const MSG_HELP_PRNT_1 = "- Scrivi '*antonio asporto 2 margherite 19.30*' per prenotare da ASPORTO a nome Antonio 2 Margherite per oggi alle 19:30.";
+const MSG_HELP_PRNT_2 = "- Scrivi '*antonio 4*' per prenotare un tavolo a nome Antonio per 4 persone per questa sera all'orario standard (00:00).";
+const MSG_HELP_PRNT_3 = "- Oppure scrivi '*antonio 4 20.30*' per prenotare un tavolo a nome Antonio per 4 persone per questa sera alle 20:30.";
+const MSG_HELP_PRNT_4 = "- Oppure scrivi '*antonio 4 20.30 1/2*' per prenotare un tavolo a nome Antonio per 4 persone per il primo Febbraio alle 20:30.";
+
+const MSG_HELP_RSRV = "Se vuoi conoscere le PRENOTAZIONI registrate:";
+const MSG_HELP_RSRV_A = "Scrivi '*prenotazioni asporto*(facoltativo) *Data*(facoltativa)'. ";
+const MSG_HELP_RSRV_1 = "- Scrivi '*prenotazioni*' per sapere le prenotazioni con tavolo per stasera.";
+const MSG_HELP_RSRV_2 = "- Scrivi '*prenotazioni 1/2*' oppure '*01/02/22*' per conoscere le prenotazioni di un determinato giorno.";
+const MSG_HELP_RSRV_3 = "- Scrivi '*prenotazioni asporto 1/2*' per conoscere le prenotazioni da asporto registrate per il primo Febbraio.";
+
+const MSG_HELP_MAIL = "Se sei stato abilitato e vuoi ricevere le PRENOTAZIONI registrate via EMAIL:";
+const MSG_HELP_MAIL_A = "Scrivi '*emailme asporto*(facoltativo) *Data*(facoltativa)'. ";
+const MSG_HELP_MAIL_1 = "- Scrivi '*emailme*' per ricevere via email le prenotazioni con TAVOLO per questa sera.";
+const MSG_HELP_MAIL_2 = "- Scrivi '*emailme 1/2*' per ricevere via mail le prenotazioni con TAVOLO per il primo Febbraio.";
+const MSG_HELP_MAIL_3 = "- Scrivi '*emailme asporto 1/2*' per ricevere via mail le prenotazioni da ASPORTO per il primo Febbraio.";
+
+const MSG_HELP_CNCL = "Se vuoi CANCELLARE una prenotazione:";
+const MSG_HELP_CNCL_A = "Scrivi '*cancella NomePrenotazione Data*(facoltativa)'.";
+const MSG_HELP_CNCL_1 = "- Scrivi '*cancella antonio*' per cancellare la prenotazione a nome Antonio per questa sera.";
+const MSG_HELP_CNCL_2 = "- Scrivi '*cancella antonio 1/2*' per cancellare la prenotazione a nome Antonio per il primo Febbraio.";
 
 /**
  * SENDERS
@@ -287,13 +317,28 @@ function rimuoviData(nomePrenotazione) {
   var testo = nomePrenotazione.split(" ");
   var num_blocchi = testo.length;
   var testobonificato = "";
-  for (i = 0; i < num_blocchi - 1; i++) {
+  for (let i = 0; i < num_blocchi - 1; i++) {
     testobonificato += testo[i] + " ";
   }
   return testobonificato;
 }
-function getHelpDescription(){
-  return MSG_HELP_MAIN + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_1+ ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_2+ASCII_CHAR_NEW_LINE_CODE+MSG_HELP_3;
+function getHelpDescription(part) {
+  if (part == HELP_MAIN_CMD) {
+    return MSG_HELP_MAIN + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_MAIN_1 + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_MAIN_2;
+  } else if (part == HELP_PRENOTA_CMD) {
+    return MSG_HELP_PRNT + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_PRNT_A + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_PRNT_B +
+      ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_PRNT_1 + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_PRNT_2 + ASCII_CHAR_NEW_LINE_CODE +
+      MSG_HELP_PRNT_3 + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_PRNT_4;
+  } else if (part == HELP_PRENOTAZIONI_CMD) {
+    return MSG_HELP_RSRV + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_RSRV_A + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_RSRV_1 +
+      ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_RSRV_2 + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_RSRV_3;
+  } else if (part == HELP_EMAILME_CMD) {
+    return MSG_HELP_MAIL + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_MAIL_A + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_MAIL_1 +
+      ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_MAIL_2 + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_MAIL_3;
+  } else if (part == HELP_CANCELLA_CMD) {
+    return MSG_HELP_CNCL + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_CNCL_A + ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_CNCL_1 +
+      ASCII_CHAR_NEW_LINE_CODE + MSG_HELP_CNCL_2;
+  }
 }
 /**
  * BUTTONS
@@ -453,33 +498,36 @@ function processReservation(user, giornoPrenotazione, time, text) {
   var numeroPersone = 0;
   var orarioH = 00;
   var orarioM = '00'; //string to not crop 00 
-
-  text = text.replace(/[.,:_]+/g, ' ');
-  text = text.replace(/ a /g, ' ');
-  text = text.replace(/ e /g, ' ');
-  text = text.replace(/\s[\s]+/g, ' ');
-
+  
   var prenotazione = text;
-
   if (prenotazione.includes("/")) {
     prenotazione = rimuoviData(prenotazione);
   }
-
-  if (text.includes(ASPORTO)) {
-    text_split = text.split(" ");
+  if (prenotazione.includes(ASPORTO)) {
+    text_split = prenotazione.split(" ");
+    if (!time) {
+      for (let i = 0; i < text_split.length; i++) {
+        if (text_split[i].includes(".") || text_split[i].includes(":")) {
+          time = text_split[i];
+          prenotazione= prenotazione.replace(time,"");
+          time = time.replace(".", ":");          
+        }
+      }
+    }
     var nomePrenotazione = text_split[0];
-    var ordinazione = text.substring(nomePrenotazione.length + 1);
+    var ordinazione = prenotazione.substring(nomePrenotazione.length + 1);
     ordinazione = ordinazione.replace(ASPORTO, "");
-    //manca gestione time se inserito a mano
     return doReservationTakeAway(user, giornoPrenotazione, time, nomePrenotazione, ordinazione, text);
   }
-
+  prenotazione = prenotazione.replace(/[.,:_]+/g, ' ');
+  prenotazione = prenotazione.replace(/ a /g, ' ');
+  prenotazione = prenotazione.replace(/ e /g, ' ');
+  prenotazione = prenotazione.replace(/\s[\s]+/g, ' ');
   var numbers = prenotazione.match(/^\d+|\d+\b|\d+(?=\w)/g);
   var nomePrenotazione = prenotazione.substring(0, prenotazione.indexOf(numbers[0]));
   nomePrenotazione = nomePrenotazione.trim();
-
   if (isNaN(numbers[0])) {
-    return MSG_SALUTO + user +MSG_RESERVATION_ERROR_NUMBER_PERSON;
+    return MSG_SALUTO + user + MSG_RESERVATION_ERROR_NUMBER_PERSON;
   }
   else {
     numeroPersone = numbers[0];
@@ -513,7 +561,7 @@ function deleteReservation(user, giornoPrenotazione, text) {
   var cell3;
   var numPrenotFound = result.length;
   if (numPrenotFound == 0) {
-    return MSG_SALUTO + user  +MSG_DELETE_RESERVATION_ERROR_NOT_FOUND;
+    return MSG_SALUTO + user + MSG_DELETE_RESERVATION_ERROR_NOT_FOUND;
   }
   var rowindex;
   for (let i = 0; i < result.length; i++) {
@@ -527,7 +575,7 @@ function deleteReservation(user, giornoPrenotazione, text) {
       cell3.setFontLine(CELL_STYLE_TESTO_BARRATO);
       cell2 = sheet.getRange(rowindex, COPERTI_COLUMN_INDEX);
       cell2.setValue(CANCELLATO);
-      return MSG_SALUTO + user + MSG_DELETE_RESERVATION_SUCCESS + nomePrenotazione + " per il " + giornoPrenotazione;
+      return MSG_OK + user + MSG_DELETE_RESERVATION_SUCCESS + nomePrenotazione + " per il " + giornoPrenotazione;
     }
     cell3.setBackground(HEADER_TOT_BACKGROUND_COLOR);
   };
@@ -834,11 +882,19 @@ function processTextMessage(chat_id, user, text, date, time) {
     return sendKeyboard(chat_id, chat_answer, getMainButtons(user));
   }
   if (text == CMD_HELP) {
-    chat_answer = MSG_SALUTO + user + "! "+ASCII_CHAR_NEW_LINE_CODE + getHelpDescription();
-    return sendMessageFormatted(chat_id, chat_answer);
+    chat_answer = MSG_SALUTO + user + "! " + ASCII_CHAR_NEW_LINE_CODE + getHelpDescription(HELP_MAIN_CMD);
+    sendMessageFormatted(chat_id, chat_answer);
+    sendMessageFormatted(chat_id, "" + getHelpDescription(HELP_PRENOTA_CMD));
+    sendMessageFormatted(chat_id, "" + getHelpDescription(HELP_PRENOTAZIONI_CMD));
+    sendMessageFormatted(chat_id, "" + getHelpDescription(HELP_CANCELLA_CMD));
+    sendMessageFormatted(chat_id, "" + getHelpDescription(HELP_EMAILME_CMD));
+    return;
   }
   else if (text.startsWith(PRENOTAZIONI)) {
     var asporto = false;
+    if (text.includes(ASPORTO)) {
+      asporto = true;
+    }
     var prenotazioni = getReservations(giornoPrenotazione, asporto);
     if (!prenotazioni) {
       chat_answer = MSG_GET_NO_RESERVATIONS;
@@ -850,7 +906,10 @@ function processTextMessage(chat_id, user, text, date, time) {
   }
   else if (text.startsWith(EMAILME)) {
     var asporto = false;
-    chat_answer = MSG_SALUTO + user+"! ";
+    if (text.includes(ASPORTO)) {
+      asporto = true;
+    }
+    chat_answer = MSG_SALUTO + user + "! ";
     chat_answer += emailMeReservation(user, giornoPrenotazione, asporto);
   }
   else if (text.startsWith(CANCELLA)) {
@@ -940,7 +999,7 @@ function test() {
   var text = "prenotazioni 25/1/2022";
   //var text = 'start'; // prenotazione
   //var text = "/start"; // start
-  //var text = "cancella san " + giorno_prenotazione_text; // cancellazione
+  //var text = "cancella san matto " + giorno_prenotazione_text; // cancellazione
   //var text = "prenotazioni"; // prenotazioni
   //var text = "emailme"; //email me
   text = text.toUpperCase();
