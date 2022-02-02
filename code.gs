@@ -43,13 +43,8 @@ const HELP_PRENOTAZIONI_CMD = PRENOTAZIONI;
 const HELP_EMAILME_CMD = EMAILME;
 const HELP_CANCELLA_CMD = CANCELLA;
 
-
 const CALLBACK_TAVOLO = "INSIDE";
 const CALLBACK_ASPORTO = "TAKEAW";
-const CALLBACK_LIST_PREN = "GETRESERVE";
-const CALLBACK_PRENOTA_ORARIO = "TIME_PRNT";
-const CALLBACK_PRENOTA = "PRNT";
-const CALLBACK_CANCELLA = "CNCL";
 const CALLBACK_NOT_PROPERLY_RECOGNIZED = "NPRZ";
 const CALLBACK_VOICE = "VOICE";
 
@@ -175,7 +170,7 @@ const MSG_DATE_TO_GETLIST = "per cui vuoi vedere le prenotazioni! ";
 const MSG_DELETE_RESERVATION_SUCCESS = " ho cancellato la prenotazione di ";
 const MSG_DATE_TO_CANCEL = "per cui vuoi cancellare la prenotazione! ";
 const MSG_DATE_TO_CANCEL2 = " che vuoi cancellare";
-const CANCELLATO = "canceled";
+const CANCELLATO = "cancelled";
 /**
  * ERROR MESSAGES
  */
@@ -379,36 +374,36 @@ function getNextDatesButton(action, now) {
     ]
   };
 }
-function getOrariButton(action, giornoPrenotazione) {
+function getOrariButton(action) {
   return {
     "inline_keyboard": [
       [{
         "text": "19:30",
-        "callback_data": action + "_" + giornoPrenotazione + "_19:30"
+        "callback_data": action + "_19:30"
       },
       {
         "text": "19:45",
-        "callback_data": action + "_" + giornoPrenotazione + "_19:45"
+        "callback_data": action + "_19:45"
       }],
       [{
         "text": "20:00",
-        "callback_data": action + "_" + giornoPrenotazione + "_20:00"
+        "callback_data": action + "_20:00"
       },
       {
         "text": "20:15",
-        "callback_data": action + "_" + giornoPrenotazione + "_20:15"
+        "callback_data": action + "_20:15"
       }],
       [{
         "text": "20:30",
-        "callback_data": action + "_" + giornoPrenotazione + "_20:30"
+        "callback_data": action + "_20:30"
       },
       {
         "text": "20:45",
-        "callback_data": action + "_" + giornoPrenotazione + "_20:45"
+        "callback_data": action + "_20:45"
       }],
       [{
         "text": "21:00",
-        "callback_data": action + "_" + giornoPrenotazione + "_21:00"
+        "callback_data": action + "_21:00"
       }]
     ]
   };
@@ -498,7 +493,7 @@ function processReservation(user, giornoPrenotazione, time, text) {
   var numeroPersone = 0;
   var orarioH = 00;
   var orarioM = '00'; //string to not crop 00 
-  
+
   var prenotazione = text;
   if (prenotazione.includes("/")) {
     prenotazione = rimuoviData(prenotazione);
@@ -509,8 +504,8 @@ function processReservation(user, giornoPrenotazione, time, text) {
       for (let i = 0; i < text_split.length; i++) {
         if (text_split[i].includes(".") || text_split[i].includes(":")) {
           time = text_split[i];
-          prenotazione= prenotazione.replace(time,"");
-          time = time.replace(".", ":");          
+          prenotazione = prenotazione.replace(time, "");
+          time = time.replace(".", ":");
         }
       }
     }
@@ -600,12 +595,12 @@ function getFilteredReservations(giornoPrenotazione, asporto, email) {
   var newRows = null;
   if (asporto == true) {
     newRows = rows.filter(function (row) {
-      return row[3] == "ASPORTO";
+      return row[3] == "ASPORTO" && row[2] != CANCELLATO;
     });
   }
   else {
     newRows = rows.filter(function (row) {
-      return row[3] == "";
+      return row[3] == "" && row[2] != CANCELLATO;
     });
   }
   if (newRows.length == 0) {
@@ -623,7 +618,7 @@ function getFilteredReservations(giornoPrenotazione, asporto, email) {
     prenotazioni = "= " + total[0] + " = " + total[1] + newLineCode;
     prenotazioni = prenotazioni.replace(/[.,:_]+/g, ' ');
   }
-  var prenotazione;
+  /**var prenotazione;
   newRows.forEach(row => {
     prenotazione = "";
     for (let i = 0; i < 3; i++) {
@@ -634,7 +629,7 @@ function getFilteredReservations(giornoPrenotazione, asporto, email) {
       prenotazione += row[i] + tabCode;
     }
     prenotazioni += prenotazione + newLineCode;
-  });
+  });*/
   return prenotazioni;
 }
 /**
@@ -734,33 +729,34 @@ function processCallback(contents) {
   var user = contents.callback_query.message.chat.first_name;
   var text = contents.callback_query.data;
   chat_answer = MSG_SALUTO + user + "! ";
+  var commands = text.split("_");
+  var numCommands = commands.length;
+  var main_command = commands[0];
 
   //PRENOTAZIONI - PICK A LOCATION
-  if (text == PRENOTAZIONI) {
+  if (main_command == PRENOTAZIONI && numCommands == 1) {
     chat_answer = MSG_PICK_A_LOCATION + MSG_DATE_TO_GETLIST;
     answerCallbackMessage(query_id, "");
     return sendKeyboard(chat_id, chat_answer, getLocationButtons(PRENOTAZIONI));
   }
   //PRENOTAZIONI - PICK A DATE
-  else if (text.startsWith(PRENOTAZIONI)) {
-    var now = new Date();
-    var location = text.substring(PRENOTAZIONI.length + 1);
-    var next_dates_button = getNextDatesButton(CALLBACK_LIST_PREN + "_" + location, now);
+  else if (main_command == PRENOTAZIONI && numCommands == 2) {
+    var next_dates_button = getNextDatesButton(text, new Date());
     chat_answer = MSG_PICK_A_DATE + MSG_DATE_TO_GETLIST;
     answerCallbackMessage(query_id, "");
     return sendKeyboard(chat_id, chat_answer, next_dates_button);
   }
   //PRENOTAZIONE - GET A NAME
-  else if (text.startsWith(CALLBACK_LIST_PREN)) {
+  else if (main_command == PRENOTAZIONI && numCommands == 3) {
     chat_answer = MSG_OK + user + "! ";
-    var location = text.substring(CALLBACK_LIST_PREN.length + 1, CALLBACK_LIST_PREN.length + 1 + CALLBACK_ASPORTO.length);
+    var location = commands[1];
     var asporto = false;
     var location_text = MSG_WITH_TABLE;
     if (location == CALLBACK_ASPORTO) {
       asporto = true;
       location_text = MSG_TAKE_AWAY;
     }
-    var giornoPrenotazione = text.substring(CALLBACK_LIST_PREN.length + 1 + CALLBACK_ASPORTO.length + 1);
+    var giornoPrenotazione = commands[2];
     var prenotazioni = getReservations(giornoPrenotazione, asporto);
     if (!prenotazioni) {
       chat_answer = MSG_GET_NO_RESERVATIONS;
@@ -769,21 +765,20 @@ function processCallback(contents) {
       chat_answer += MSG_GET_RESERVATIONS + location_text + MSG_CHAT_FOR + giornoPrenotazione + ASCII_HEX_NEW_LINE_CODE;
       chat_answer += prenotazioni;
     }
-    answerCallbackMessage(query_id, MSG_OK_DAY_SELECTED);
+    answerCallbackMessage(query_id, MSG_OK_DAY_SELECTED);    
     sendMessage(chat_id, chat_answer);
     return sendKeyboard(chat_id, MSG_CHAT_RENEW, MAIN_REPLY_COMMAND_BUTTONS);
   }
   //EMAIL
-  else if (text == EMAILME) {
+  else if (main_command == EMAILME && numCommands == 1) {
     chat_answer = MSG_PICK_A_LOCATION + MSG_DATE_TO_EMAIL_LIST;
     answerCallbackMessage(query_id, "");
     return sendKeyboard(chat_id, chat_answer, getLocationButtons(text));
   }
   //EMAIL - PICK A LOCATION
-  else if (text.startsWith(EMAILME)) {
+  else if (main_command == EMAILME && numCommands == 2) {
     chat_answer = MSG_OK + user + "! ";
     var asporto = false;
-    var commands = text.split("_");
     if (commands[1] == CALLBACK_ASPORTO) {
       asporto = true;
     }
@@ -793,75 +788,73 @@ function processCallback(contents) {
     return sendKeyboard(chat_id, MSG_CHAT_RENEW, MAIN_REPLY_COMMAND_BUTTONS);
   }
   //PRENOTA - PICK A LOCATION
-  else if (text == PRENOTA) {
+  else if (main_command == PRENOTA && numCommands == 1) {
     chat_answer = MSG_PICK_A_LOCATION + MSG_DATE_TO_RESERVE;
     answerCallbackMessage(query_id, "");
-    return sendKeyboard(chat_id, chat_answer, getLocationButtons(PRENOTA));
+    return sendKeyboard(chat_id, chat_answer, getLocationButtons(text));
   }
   //PRENOTA - PICK A DATE
-  else if (text.startsWith(PRENOTA) && text.length == (PRENOTA.length + 1 + CALLBACK_TAVOLO.length)) {
-    var now = new Date();
-    var location = text.substring(PRENOTA.length + 1);
+  else if (main_command == PRENOTA && numCommands == 2) {
+    var location = commands[1];
     var location_text = MSG_WITH_TABLE;
     if (location == CALLBACK_ASPORTO)
       location_text = MSG_TAKE_AWAY;
-    var next_dates_button = getNextDatesButton(text, now);
+    var next_dates_button = getNextDatesButton(text, new Date());
     chat_answer = MSG_PICK_A_DATE + MSG_DATE_TO_RESERVE + location_text;
     answerCallbackMessage(query_id, "");
     return sendKeyboard(chat_id, chat_answer, next_dates_button);
   }
   //PRENOTA - PICK A TIME
-  else if (text.startsWith(PRENOTA + "_" + CALLBACK_TAVOLO) || text.startsWith(PRENOTA + "_" + CALLBACK_ASPORTO)) {
-    var giornoPrenotazione = text.substring(PRENOTA.length + 1 + CALLBACK_TAVOLO.length + 1);
-    var location = text.substring(PRENOTA.length + 1, PRENOTA.length + 1 + CALLBACK_TAVOLO.length);
+  else if (main_command == PRENOTA && numCommands == 3) {
+    var giornoPrenotazione = commands[2];
+    var location = commands[1];
     var location_text = MSG_WITH_TABLE;
     if (location == CALLBACK_ASPORTO)
       location_text = MSG_TAKE_AWAY;
-    var times_button = getOrariButton(CALLBACK_PRENOTA_ORARIO + "_" + text.substring(PRENOTA.length + 1, PRENOTA.length + 1 + CALLBACK_TAVOLO.length), giornoPrenotazione);
+    var times_button = getOrariButton(text);
     chat_answer = MSG_PICK_A_TIME + MSG_DATE_TO_RESERVE + location_text + MSG_CHAT_FOR + giornoPrenotazione;
     answerCallbackMessage(query_id, MSG_OK_DAY_SELECTED);
     return sendKeyboard(chat_id, chat_answer, times_button);
   }
   //PRENOTA - GET A NAME
-  else if (text.startsWith(CALLBACK_PRENOTA_ORARIO)) {
-    chat_answer = MSG_OK + user + "! ";
-    var location = text.substring(CALLBACK_PRENOTA_ORARIO.length + 1, CALLBACK_PRENOTA_ORARIO.length + 1 + CALLBACK_TAVOLO.length);
-    var datetime = text.substring(CALLBACK_PRENOTA_ORARIO.length + 1 + CALLBACK_TAVOLO.length + 1);
-    var location_text = MSG_WITH_TABLE;
-    chat_answer += MSG_GIVE_ME_NAME_RESERVATION + MSG_BLANK_DIVIDED + MSG_GIVE_ME_NUMBERS + MSG_DATE_TO_RESERVE2 + location_text + MSG_CHAT_FOR + datetime;
+  else if (main_command == PRENOTA && numCommands == 4) {
+    chat_answer = MSG_OK + user + "! "+ MSG_GIVE_ME_NAME_RESERVATION + MSG_BLANK_DIVIDED;
+    var location = commands[1];
+    var date = commands[2];
+    var time = commands[3];
     if (location == CALLBACK_ASPORTO) {
-      location_text = MSG_TAKE_AWAY;
-      chat_answer += MSG_GIVE_ME_NAME_RESERVATION + MSG_BLANK_DIVIDED + MSG_ORDER + MSG_DATE_TO_RESERVE2 + MSG_TAKE_AWAY + MSG_CHAT_FOR + datetime;
+      chat_answer += MSG_ORDER + MSG_DATE_TO_RESERVE2 + MSG_TAKE_AWAY + MSG_CHAT_FOR + date + "_" + time;
+    }
+    else {
+      chat_answer += MSG_GIVE_ME_NUMBERS + MSG_DATE_TO_RESERVE2 + MSG_WITH_TABLE + MSG_CHAT_FOR + date + "_" + time;
     }
     answerCallbackMessage(query_id, MSG_OK_TIME_SELECTED);
     return sendKeyboard(chat_id, chat_answer, REPLY_COMMAND);
   }
   //CANCELLA - PICK A DATE
-  else if (text == CANCELLA) {
-    var now = new Date();
-    var next_dates_button = getNextDatesButton(CALLBACK_CANCELLA, now);
+  else if (main_command == CANCELLA && numCommands == 1) {
+    var next_dates_button = getNextDatesButton(text, new Date());
     chat_answer += MSG_PICK_A_DATE + MSG_DATE_TO_CANCEL;
     answerCallbackMessage(query_id, "");
     return sendKeyboard(chat_id, chat_answer, next_dates_button);
   }
   //CANCELLA - GET A NAME
-  else if (text.startsWith(CALLBACK_CANCELLA)) {
+  else if (main_command == CANCELLA && numCommands == 2) {
     chat_answer = MSG_OK + user + "! ";
-    chat_answer += MSG_GIVE_ME_NAME_RESERVATION + MSG_DATE_TO_CANCEL2 + " del : " + text.substring(CALLBACK_CANCELLA.length + 1);
+    chat_answer += MSG_GIVE_ME_NAME_RESERVATION + MSG_DATE_TO_CANCEL2 + " del : " + commands[1];
     answerCallbackMessage(query_id, MSG_OK_DAY_SELECTED);
     return sendKeyboard(chat_id, chat_answer, REPLY_COMMAND);
   }
   //VOICE
-  else if (text == (CALLBACK_VOICE + "_" + CALLBACK_NOT_PROPERLY_RECOGNIZED)) {
-    chat_answer = MSG_SORRY_RETRY;
+  else if (main_command == CALLBACK_VOICE && numCommands >1) {
     answerCallbackMessage(query_id, "");
-    return sendMessage(chat_id, chat_answer);
+    if(commands[1]== CALLBACK_NOT_PROPERLY_RECOGNIZED){
+      chat_answer = MSG_SORRY_RETRY;
+      return sendMessage(chat_id, chat_answer);
+    }    
+    return processTextMessage(chat_id, user, commands[1]);
   }
-  else if (text.startsWith(CALLBACK_VOICE)) {
-    answerCallbackMessage(query_id, "");
-    return processTextMessage(chat_id, user, text.substr(CALLBACK_VOICE.length + 1));
-  }
-  else if (text == CMD_YES) {
+  else if (main_command == CMD_YES) {
     chat_answer = MSG_SALUTO + user + MSG_START;
     answerCallbackMessage(query_id, "");
     return sendKeyboard(chat_id, chat_answer, getMainButtons(user));
